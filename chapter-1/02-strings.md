@@ -63,3 +63,16 @@ isEmpty(emptyString)
 ```
 
 Both of the above will return true.
+
+Swift also has some methods that will change the case of a string—with a catch: Some functionality is built into the language itself and some is actually kept in [Apple's Foundation framework][foundation]. If you want to use `NSString`'s `uppcaseString` method you have to `import Foundation` at the beginning of your file.
+
+[foundation]: https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/ObjC_classic/index.html
+
+```swift
+import Foundation
+
+let greeting = "hello"
+
+greeting.uppercaseString // returns "HELLO"
+greeting.uppercaseString.lowercaseString // returns "hello"
+```
