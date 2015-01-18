@@ -11,7 +11,7 @@ Let's meditate on the following scenario.
 When we're dealing with dictionaries, we can pull out a value by handing the dictionary a key.
 
 ```swift
-leet shoppingList = ["apples": 1, "oranges": 5, "pizzas": 1000]
+let shoppingList = ["apples": 1, "oranges": 5, "pizzas": 1000]
 
 let numberOfPizzasToBuy = shoppingList["pizzas"]
 ```
