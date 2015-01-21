@@ -132,7 +132,7 @@ Recall if we only setting a getter on a computed property, we can write the enti
 
 Can you write computed properties for 18% and 20% tips.
 
-### Iteration Two: Xcode Project
+## Iteration Two: Xcode Project
 
 Let's set up a new Single-View Application Project in Xcode called GoodTipper.
 
@@ -319,3 +319,200 @@ The resulting method should look like this:
     tipCalculationTextView.text = "A twenty precent tip would be \(tipCalculator.twentyPercentTip) and your total bill would be \(tipCalculator.totalBillForTwentyPercentTip)"
   }
 ```
+
+Let's fire up the simulator. If all went well, we should be able generate a tip and total bill amount.
+
+Let's do one other fun tweak. There is not a lot going on in this application so it's fair to say that when someone fires up the application that they pretty much always want to enter a bill amount. We can have the `billAmountTextField` be what's called the `firstResponder`. The `firstResponder` is the UI element that takes focus when we first enter that view.
+
+Let's implement this feature:
+
+```swift
+override func viewDidLoad() {
+  super.viewDidLoad()
+  billAmountTextField.becomeFirstResponder()
+}
+```
+
+At the end of this iteration. Our ViewController should look as follows:
+
+```swift
+import UIKit
+import Foundation
+
+class ViewController: UIViewController {
+
+  let tipCalculator = TipCalculatorModel(amount: 20)
+
+  @IBOutlet weak var billAmountTextField: UITextField!
+  @IBOutlet weak var tipCalculationTextView: UITextView!
+
+  @IBAction func calculateButtonTapped(sender: AnyObject) {
+    refreshUserInterface()
+  }
+
+  func refreshUserInterface() {
+    let billAmount = Double((billAmountTextField.text as NSString).doubleValue)
+    tipCalculator.billAmount = billAmount
+    tipCalculationTextView.text = "A twenty precent tip would be \(tipCalculator.twentyPercentTip) and your total bill would be \(tipCalculator.totalBillForTwentyPercentTip)"
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    billAmountTextField.becomeFirstResponder()
+  }
+
+  override func didReceiveMemoryWarning() {
+    super.didReceiveMemoryWarning()
+    // Dispose of any resources that can be recreated.
+  }
+
+}
+```
+
+## Iteration Three: More Better
+
+Let's add two labels: A static label that says "Tip Amount" and then a label for the actual tip amount that we'll update with code. We'll also add a slider.
+
+Make sure to "Add Missing Constraints" and "Update Existing Constraints".
+
+The goal is that we'll update the tip and total bill amount as the user adjusts the parameters in the UI.
+
+We'll have a few subiterations as we go along.
+
+### Subiteration: Update the Tip Percentage
+
+Step one, let's wire up this slider we just added to the UI. We're going to do a bit more of that control-drag action. The end result should be the following code.
+
+```swift
+@IBOutlet weak var tipPercentageSlider: UISlider!
+@IBOutlet weak var tipPercentageLabel: UILabel!
+
+@IBAction func tipPercentageSliderChanged(sender: AnyObject) {
+  println(tipPercentageSlider.value)
+}
+```
+
+Let's start by updating that label. Here is a reasonable first pass:
+
+```swift
+@IBAction func tipPercentageSliderChanged(sender: AnyObject) {
+  let tipPercentage = Int(tipPercentageSlider.value)
+  tipPercentageLabel.text = "\(tipPercentage)%"
+}
+```
+
+We're casting the slider value to an integer to get a value without a ton of decimal places.
+
+### Subiteration: Refactoring our Tip Calculator Model
+
+Now, before we go on and write some bad code. Let's refactor `TipCalculatorModel`. We're getting the tip percentage from the UI now, it would be nice if we could just have it maintain the state of the tip percentage and do its calculations internally.
+
+In this refactoring, we're going to:
+
+* Give our model a tip percentage that can be updated
+* Have all of our internal methods rely on that tip percentage
+
+The name of the game here is converting our functions to computed properties:
+
+```swift
+import Foundation
+
+class TipCalculatorModel {
+
+  var billAmount: Double
+  var tipPercentage: Int = 20
+
+  let formatter = NSNumberFormatter()
+
+  init(amount: Double) {
+    self.billAmount = amount
+    formatter.numberStyle = .CurrencyStyle
+  }
+
+  var tipAmount: Double {
+    return billAmount * Double(tipPercentage)
+  }
+
+  var totalBill: Double {
+    return billAmount + tipAmount
+  }
+
+  var tipAmountAsCurrency: String {
+    return formatter.stringFromNumber(tipAmount)!
+  }
+
+  var totalBillAsCurrency: String {
+    return formatter.stringFromNumber(totalBill)!
+  }
+
+}
+```
+
+Much better. The calculator knows about it's own tip percentage and we just use a few computed properties.
+
+Our changes are going to break `refreshUserInterface`, so let's just remove the broken code for now.
+
+```swift
+func refreshUserInterface() {
+  let billAmount = Double((billAmountTextField.text as NSString).doubleValue)
+  tipCalculator.billAmount = billAmount
+}
+```
+
+We can also update our `tipPercentageSliderChanged` function as well:
+
+```swift
+@IBAction func tipPercentageSliderChanged(sender: AnyObject) {
+  let tipPercentage = Int(tipPercentageSlider.value)
+  tipCalculator.tipPercentage = tipPercentage
+  tipPercentageLabel.text = "\(tipCalculator.tipPercentage)%"
+}
+```
+
+### Subiteration: Get Rid of the Calculate Button
+
+Let's apply our new knowledge of updating the UI when a value changes and it apply it to that text box as well.
+
+Control-drag from the bill amount input field to the ViewController. We're going to set an action on "Editing Changed". Let's call it `billAmountChanged`. Let's steal that code we wrote before for changing the bill amount in `refreshUserInterface` and put it up here instead. The resulting code should look like this:
+
+```swift
+@IBAction func billAmountChanged(sender: AnyObject) {
+  tipCalculator.billAmount = Double((billAmountTextField.text as NSString).doubleValue)
+}
+```
+
+We can remove it from our `refreshUserInterface` method as well, which should now be a nice slim little one liner:
+
+```swift
+func refreshUserInterface() {
+  tipCalculationTextView.text = "The tip will be \(tipCalculator.tipAmountAsCurrency) for a total bill of \(tipCalculator.totalBillAsCurrency)."
+}
+```
+
+We can now totally remove the the action that fires when the "Calculate" button is hit. Let's then refactor what's left to look like the following:
+
+```swift
+@IBAction func billAmountChanged(sender: AnyObject) {
+  tipCalculator.billAmount = Double((billAmountTextField.text as NSString).doubleValue)
+  refreshUserInterface()
+}
+
+@IBAction func tipPercentageSliderChanged(sender: AnyObject) {
+  let tipPercentage = Int(tipPercentageSlider.value)
+  tipCalculator.tipPercentage = tipPercentage
+  refreshUserInterface()
+}
+
+func refreshUserInterface() {
+  tipCalculationTextView.text = "The tip will be \(tipCalculator.tipAmountAsCurrency) for a total bill of \(tipCalculator.totalBillAsCurrency)."
+  tipPercentageLabel.text = "\(tipCalculator.tipPercentage)%"
+}
+```
+
+Lastly, let's remove the calculate button and update the constraints on our UI.
+
+### Your Turn
+
+Can you get rid of that big, ugly text view where were putting that little narrative (e.g. "The tip will be \(tipCalculator.tipAmountAsCurrency) for a total bill of \(tipCalculator.totalBillAsCurrency)").
+
+Let's add four UI labels. The first two will just be static values: "Tip Amount" and "Bill Amount". Add two more that we'll update whenever the values change.
