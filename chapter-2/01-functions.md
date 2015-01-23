@@ -1,6 +1,6 @@
 # Functions
 
-In Chapter One, we spent a long time talking about the different types availabe to us in Swift. In this chapter, we're going to talk about how to work with data and how to create our own data structures.
+In Chapter One, we spent a long time talking about the different types available to us in Swift. In this chapter, we're going to talk about how to work with data and how to create our own data structures.
 
 In Swift, like JavaScript, functions are first class objects. That means we can treat them like any other data in our application. Their syntax is similar to JavaScript, but we must define the types of data going into our function as well as the types coming out of our function.
 

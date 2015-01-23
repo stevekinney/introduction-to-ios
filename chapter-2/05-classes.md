@@ -58,7 +58,7 @@ potentiallyAnotherDog.name // returns "Riley"
 
 Oh. Wait. `dog` and `potentiallyAnotherDog` were both pointing to the same object. Changing it one place change it in the other.
 
-We also saw something else in this code example. Previously, we were just setting some defaults for the parameters. Here we want to have to explictly pass a name to our dog. Dogs love responding to their names and it is a little messed up to ask them to go nameless. Also, if all of our dogs had the same name and we called one of them, we'd get all of them and there is definitely such a thing as too much dog.
+We also saw something else in this code example. Previously, we were just setting some defaults for the parameters. Here we want to have to explicitly pass a name to our dog. Dogs love responding to their names and it is a little messed up to ask them to go nameless. Also, if all of our dogs had the same name and we called one of them, we'd get all of them and there is definitely such a thing as too much dog.
 
 `init()` fires when our object is initialized. It's a function even though it looks a little strange. We can use `self` to talk about the object we're currently instantiating. Swift also gives us a `deinit()`.
 

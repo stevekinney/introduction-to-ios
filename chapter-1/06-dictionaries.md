@@ -8,7 +8,7 @@ Let's start with a very simple dictionary so we can get a feel for their syntax:
 let shoppingList = [apples: 2, oranges: 1]
 ```
 
-The first thing that might have occured to you is "Holy square brackets, Batman!" Yea, dictionaries in Swift have square brackets. I don't really know what else to tell you.
+The first thing that might have occurred to you is "Holy square brackets, Batman!" Yea, dictionaries in Swift have square brackets. I don't really know what else to tell you.
 
 A common recurring theme that we've encountered is that, from time to time, we have to initialize an empty collection before we put anything in it. Let's get that out of the way now, shall we?
 

@@ -12,17 +12,17 @@ Xcode also features a library full of UI elements in its Asset Catalog. Simply c
 * Snap it to the center of the ViewController
 * Rename the button to "Forth"
 * Hold control and drag to the second pane
-* Change the action seque to "present modally"
+* Change the action segue to "present modally"
 * Click on the transition you just made
 * Set the transition to "Page Curl"
 * Add a button to the second ViewController
 * Snap it to the center of the ViewController
-* Rename the button to "Bact"
+* Rename the button to "Back"
 * Hold control and drag from the second ViewController to the first one
 * Select "present modally"
 * Select "Cross Dissolve"
 * Click on the "Forth" button and "Add Missing Constraints"
-* Click on the "Back" button and "Add Missing Contraints"
+* Click on the "Back" button and "Add Missing Constraints"
 * Run it in the simulator
 
 ### Quick Practice

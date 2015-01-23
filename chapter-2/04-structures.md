@@ -61,7 +61,7 @@ var rect = Rectangle(width: 100, height: 100)
 rect.perimeter
 ```
 
-Look, no parentheses after that call to `perimeter`. Swift computes the property based on the width and height of the rectange. If either of those change, Swift will update the perimeter and area properties. If we wanted to, we could also dynamically set properties with computed properties as well.
+Look, no parentheses after that call to `perimeter`. Swift computes the property based on the width and height of the rectangle. If either of those change, Swift will update the perimeter and area properties. If we wanted to, we could also dynamically set properties with computed properties as well.
 
 It's a bit contrived, but let's say for a moment that I wanted to set the `perimeter` property and and have it update `width` and `height` properties accordingly.
 

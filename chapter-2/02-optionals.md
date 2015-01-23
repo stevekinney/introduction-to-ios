@@ -20,7 +20,7 @@ We'll talk about what that little bit of code actually returns in just a bit. Fo
 
 If only programming was that easy. Things happen in programs. Let's say `shoppingList` was mutable and there was some user interaction that adds stuff to `shoppingList`. This isn't out totally out of the realm of possibility and  the compiler can't check for all the possible scenarios.
 
-If we try to access a key in a dictionary that isn't there, it returns `nil`. Hmm. That's weird. This whole time I've been telling you that Swift is obsessive about types and now I'm telling you there is a very realy likelihood that you may not have a value to hand it.
+If we try to access a key in a dictionary that isn't there, it returns `nil`. Hmm. That's weird. This whole time I've been telling you that Swift is obsessive about types and now I'm telling you there is a very real likelihood that you may not have a value to hand it.
 
 There are two possibilities here: Either I've been lying to you about Swift's type obsession or Swift has some way to deal with this ambiguity. I'm pleased to say that I'm not a liar and Swift has this under control.
 
@@ -42,7 +42,7 @@ Okay, there are a few things going on here. First we have that question mark at 
 
 On line 5, we set the variables value to 67. But, it's still an optional. We know it's 67, but Swift isn't sure just yet. We have to unwrap the optional. How do we unwrap an optional? We use an exclamation point!
 
-An optional is a lot like Schrödinger's cat. It could exist or not exist. When we use the exclamation point. We open the box and take a looksy and Swift applies all off it's type rules to the value.
+An optional is a lot like Schrödinger's cat. It could exist or not exist. When we use the exclamation point. We open the box, take a look, and Swift applies all off it's type rules to the value.
 
 Let's go back to the dictionary example above. `shoppingList` is a mutable dictionary of string keys and integer values. But, we could potentially get back `nil` if we ask for a key that is not in the dictionary. Rather than crash and burn when someone asks for a key that's in the dictionary, Swift covers its rear by just always returning an optional when someone asks for a value from a dictionary and then lets the developer figure out what to do with the value.
 
