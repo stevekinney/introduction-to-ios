@@ -518,31 +518,31 @@ import UIKit
 import Foundation
 
 class ViewController: UIViewController {
-  
+
   let tipCalculator = TipCalculatorModel(amount: 0)
   var tipPercentage = 0.20
-  
+
   @IBOutlet weak var tipPercentageSlider: UISlider!
   @IBOutlet weak var tipPercentageLabel: UILabel!
   @IBOutlet weak var billAmountTextField: UITextField!
   @IBOutlet weak var tipCalculationTextView: UITextView!
-  
+
   @IBAction func billAmountChanged(sender: AnyObject) {
     tipCalculator.billAmount = Double((billAmountTextField.text as NSString).doubleValue)
     refreshUserInterface()
   }
-  
+
   @IBAction func tipPercentageSliderChanged(sender: AnyObject) {
     let tipPercentage = Int(tipPercentageSlider.value)
     tipCalculator.tipPercentage = tipPercentage
     refreshUserInterface()
   }
-  
+
   func refreshUserInterface() {
     tipCalculationTextView.text = "The tip will be \(tipCalculator.tipAmountAsCurrency) for a total bill of \(tipCalculator.totalBillAsCurrency)."
     tipPercentageLabel.text = "\(tipCalculator.tipPercentage)%"
   }
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
     billAmountTextField.becomeFirstResponder()

@@ -4,29 +4,48 @@ status: work-in-progress
 
 # Bartleby
 
+This application is a simple notes application—a lot like the default note application for the iPhone.
+
+Let's start by creating a new project with the following settings:
+
 * Master/detail view
 * Keep Core Data unchecked
 
+## Creating a Note Class
+
 The application uses a Note class which we're going to store in a Key/Value storage.
 
-File > New > Cocoa Touch Class
-Subclass of NSObject
+To create a new file, go to:
 
-Two properties:
+*File* > *New* > *Cocoa Touch Class*
+
+For reasons we'll go into later, our `Note` object is going to be a subclass of `NSObject`.
+
+We'll have two properties: a the body of the note and the date it was created.
+
+It's going to end up looking like this:
 
 ```swift
-Date (String)
-Note (String)
+import UIKit
 
-override init() {
-  date = NSDate().description
-  note = ""
+class Note: NSObject {
+  var date:String
+  var note:String
+
+  override init() {
+    date = NSDate().description
+    note = ""
+  }
 }
 ```
 
-Go to `viewDidLoad` and set a new note to the variable `n`
+## Creating the Idea of "All Notes"
 
-In the class file, we're going to create a few objects. Swfit doesn't support class variables just yet. So we're just going to do it in the same file for the Notes class.
+Go to `viewDidLoad` in `MasterViewController.swift` and set a new note to the variable `n`.
+
+In the class file, we're going to create a few objects. Swift doesn't support class variables just yet. So we're just going to do it in the same file for the Note class.
+
+At the top of our Note class file, just under the imports:
 
 ```swift
 var allNotes:[Note] = []
@@ -36,18 +55,73 @@ var noteTable:UITableView
 
 Hmm. So, we have a minor problem. This class is loaded before we access to the UI. Which means we don't have access to your our `UITableView` just yet. We can get around this by declaring it as an optional.
 
-
 ```swift
 var allNotes:[Note] = []
 var currentNoteIndex:Int = -1
 var noteTable:UITableView?
 ```
 
-When the view loads, let's set `noteTable` to the table view in our UI. Add the following line to `viewDidLoad()`:
+Let's run the simulator right now and see what happens.
+
+* It fires up.
+* We see the table.
+* We can hit the plus sign and create a new time stamp.
+* We can navigate to the note.
+* We can navigate back.
+
+At this point, your `Note` class looks as follows:
+
+```swift
+import UIKit
+
+var allNotes:[Note] = []
+var currentNoteIndex:Int = -1
+var noteTable:UITableView?
+
+class Note: NSObject {
+  var date:String
+  var note:String
+
+  override init() {
+    date = NSDate().description
+    note = ""
+  }
+}
+```
+
+
+## Persisting Notes
+
+When the view loads, let's set `noteTable` to the table view in our UI. Add the following line to `viewDidLoad()` in `MasterViewController`:
 
 ```swift
 noteTable = self.tableView
 ```
+
+There are bunch of ways of saving data in iOS. We're going to use an option called User Defaults, which is a super simple key/value store that allows us to persist data between sessions.
+
+What are we going to have to do to make this work?
+
+* Convert our note objects to something we can store in User Defaulrts
+* Take something we stored in User Defaults and turn it back into `Note` objects.
+
+At this point, `viewDidLoad()` in `MasterViewController` looks as follows:
+
+```swift
+override func viewDidLoad() {
+  super.viewDidLoad()
+
+  noteTable = self.tableView
+
+  // Do any additional setup after loading the view, typically from a nib.
+  self.navigationItem.leftBarButtonItem = self.editButtonItem()
+
+  let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "insertNewObject:")
+  self.navigationItem.rightBarButtonItem = addButton
+}
+```
+
+### Step One: Turning Our Notes into a Dictionary
 
 Let's add a method to `Note` that turns it into a dictionary that we can store in User Defaults.
 
@@ -57,35 +131,57 @@ func dictionary() -> NSDictionary {
 }
 ```
 
+`Note` is a big complicated `NSObject`. In the method above, we boil it down to it's simplest form: a dictionary. This is something we can store in User Defaults.
+
+#### Saving Notes
+
 Let's also create a class method that will save all of our notes.
 
 ```swift
 class func saveNotes() {
   var arrayOfNotes:[NSDictionary] = []
-  for var i = 0; i < allNotes.count; i++ {
+  for var i:Int = 0; i < allNotes.count; i++ {
     arrayOfNotes.append(allNotes[i].dictionary())
   }
-  NSUserDefaults.standardUserDefault.setObject(arrayOfNotes, forKey: "notes")
+  NSUserDefaults.standardUserDefaults().setObject(arrayOfNotes, forKey: "notes")
 }
 ```
+
+Alright, so what is going on in the code above?
+
+* We are declaring an array of dictionaries.
+* We are iterating through our `allNotes` array.
+* We are turning each note into it's simple form and then appending it to the array of notes.
+* We are then storing that simple data object into User Defaults under the key `notes`.
+
+#### Loading Notes
 
 We're also going to want to load some notes, right?
 
 ```swift
-  var defaults = NSUserDefaults.standardUserDefaults()
-  var savedData:[NSDictionary]? = defaults.objectForKey("notes") as? [NSDictionary]
+class func loadNotes() {
+  var defaults:NSUserDefaults = NSUserDefaults.standardUserDefaults()
+  var savedData:[NSDictionary]? = defaults.objectForKey(kAllNotes) as? [NSDictionary]
   if let data:[NSDictionary] = savedData {
-    for var i = 0; i < data.count; i++ {
+    for var i:Int = 0; i < data.count; i++ {
       var n:Note = Note()
       n.setValuesForKeysWithDictionary(data[i])
       allNotes.append(n)
     }
   }
+}
 ```
 
 Okay, that was a lot. Let's stop for a bit and explain what's going on here.
 
-(NOTE: Go back to the chapter on optionals and talk a bit about optional chaining.)
+* Get our User Defaults
+* Look at the `notes` key
+* Put all that in a new array of `NSDictionaries` called `savedData`
+* If that worked out, iterate over it, rehydrate the simple data objects into `Note` objects and pop them back onto `allNotes`
+
+#### Wiring It Up
+
+We can save notes and we can load notes. Now we just need to hook into that functionality.
 
 Let's head back over to our good old friend `viewDidLoad()` and add the following:
 
@@ -113,27 +209,53 @@ Let's take a look at the detail view. Ideally, we don't want to have just some t
 
 We'll visit the object library and search for a text field that fits our needs.
 
-Let's take a text view and drag it on our storyboard. It has some dummy text and that's great, but it's not what we want.
+**Do this**: Let's take a *text view* and drag it on our storyboard. It has some dummy text and that's great, but it's not what we want.
 
-In DetailViewController.swift, let's delete everything but the `viewDidLoad()` and the `didRecieveWarning()` methods. (Lines 13-30)
+* Let's snap it to the the four edges and then *Apply Missing Constraints*.
+
+In `DetailViewController.swift`, let's delete everything but the `viewDidLoad()` and the `didRecieveWarning()` methods. (Lines 13-30, for those of you keeping score at home.)
 
 We'll also have to delete the `self.configureView()` call on what's now Line 16.
 
-There is also some code that needs to get taken out of MasterViewController.swift. This is because there are certain lines of code that reference the code that we just deleted and that's no good.
+There is also some code that needs to get taken out of `MasterViewController.swift`. This is because there are certain lines of code that reference the code that we just deleted and that's no good.
 
-Think of a scene has an individual screen on your phone.
+Let's hop over to the assistant editor. It's the Venn diagram in the toolbar on the upper-right.
 
-Let's hop over to the assistant editor. It's the guy with the bowtie.
+Control-drag from our new text view to the DetailsViewController and create an Outlet.
 
-Control-drag from the new text view to the DetailsViewController and create an Outlet.
+Let's call it `noteTextView`.
 
 Let's talk about what we made.
 
 ```swift
-@IBOutlet weak var tView: UITextView!
+@IBOutlet weak var noteTextView: UITextView!
+```
+
+Our `DetailViewController` should now look like this:
+
+```swift
+import UIKit
+
+class DetailViewController: UIViewController {
+
+  @IBOutlet weak var noteTextView: UITextView!
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    // Do any additional setup after loading the view, typically from a nib.
+  }
+
+  override func didReceiveMemoryWarning() {
+    super.didReceiveMemoryWarning()
+    // Dispose of any resources that can be recreated.
+  }
+
+}
 ```
 
 ### AutoLayout
+
+(Optional)
 
 A lot of our note is cut off. This stinks!
 
@@ -184,7 +306,7 @@ Let's take a look at how we do this. On Line 38.
 self.performSegueWithIdentifier("showDetail", sender: self)
 ```
 
-Let's pop down to `prepareForSegue`. We also want to set a reminder as to where we came from. 
+Let's pop down to `prepareForSegue`. We also want to set a reminder as to where we came from.
 
 In our conditional, let's add a new line below Line 46 and add the following content.
 
@@ -239,5 +361,3 @@ override func viewWillDisappear(animated: Bool) {
   noteTable?.reloatData()
 }
 ```
-
-
