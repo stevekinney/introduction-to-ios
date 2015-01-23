@@ -32,7 +32,7 @@ number = true
 
 Swift uses static typing. This means that once we set a variable, we can only change it to another value of the same type. If we set `number` to 100, we can change it to `101`, but we couldn't change it to a string like "cup of coffee".
 
-![Static Typing Error](../images/01-static-typing.png)
+![Static Typing Error](../images/static-typing.png)
 
 Swift isn't the only language that does this. Other languages like Java and C use static typing too. But they usually make you declare your type up front.
 
@@ -75,7 +75,7 @@ let number = 100
 
 So far, this looks pretty similar to declaring a variable. The only difference is that we're using `let` instead of `var`. The major difference is that we can't actually change the value of a constant once we've set it.
 
-(IMAGE: Picture of syntax error for constants)
+![Reassigning Conditionals](../images/reassigning-conditionals.png)
 
 In Swift, using constants is preferred over using variables. Immutable data (data which don't change) are easy to work with and the compiler can even make some performance optimizations with the understanding that the values assigned to constants aren't going to change.
 

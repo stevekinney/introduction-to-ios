@@ -29,7 +29,7 @@ Can you create a constant called `myFavoriteColor` and interpolate that constant
 
 In some languages, strings are mutable—which means we can modify their contents. Does Swift has mutable strings? Well, the answer is that it depends on whether you defined your string as a constant or a variable.
 
-(IMAGE: Mutating a string)
+![Mutating a String](../images/mutating-a-string.png)
 
 ## Working with Strings
 
@@ -51,7 +51,7 @@ for character in "swift" {
 
 The code above will print each console. (We've accidentally touched on iteration, but we'll get more into that later. I promise.) If your playground you might see something along the lines of `(5 times)`, but if we click on the little plus sign in your playground, you can see each iteration.
 
-(IMAGE: Iteration of strings)
+![Iteration of Strings](../images/iteration-of-strings.png)
 
 We also have two ways to check if a string if empty (e.g. `""`).
 

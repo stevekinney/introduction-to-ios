@@ -26,6 +26,8 @@ let myFloat: Double = 5.0
 myInteger + myFloat
 ```
 
+![Integer + Float](../images/integer-plus-float.png)
+
 Swift doesn't want to be in the position where it has to figure out what you wanted converted to a float and what you wanted converted to an integer—and it certainly doesn't want to choose wrong on your behalf.
 
 Swift does, however, give us the ability to cast a value from one type to another (this is called _typecasting_):
