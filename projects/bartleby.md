@@ -270,7 +270,7 @@ We're going to be really hand-wavy today about AutoLayout today and cover just e
 Xcode was nice and gave us a dummy NSMutableArray just to get the table view up and running.
 We don't want to use their dummy data anymore. We want to use our real data now.
 
-On line 35, we want to change `insertNewObject` to add to our `allNotes` array from earlier. Let's replace it with the following:
+On Line 37, we want to change `insertNewObject` to add to our `allNotes` array from earlier. Let's replace it with the following:
 
 ```swift
 allNotes.insert(Note(), atIndex: 0)
@@ -278,19 +278,19 @@ allNotes.insert(Note(), atIndex: 0)
 
 We're not using `append` because we want to put it on front of the array.
 
-On Line 45, we're going to change the code on the right-side on of the constant assignment to:
+On Line 47, we're going to change the code on the right-side on of the constant assignment to:
 
-```js
-allNotes[indexPath.row]
+```swift
+let object = allNotes[indexPath.row]
 ```
 
 On Line 57, let's change `objects.count` to `allNotes.count`.
 
-On Line 63, change `let object = objects[indexPath.row] as NSDate` to `let object = allNotes[indexPath.row]`.
+On Line 65, change `let object = objects[indexPath.row] as NSDate` to `let object = allNotes[indexPath.row]`.
 
-On Line 64, we're going change to `object.note`.
+On Line 66, we're going change to `object.note`.
 
-On 75, we're going to have another error.
+On 77, we're going to have another error.
 
 We need to change `objects.removeObjectAtIndex(indexPath.row)` to `allNotes.removeAtIndex(indexPath.row)`.
 
@@ -298,17 +298,30 @@ That should be it. All of our errors should be gone. Let's fire up out applicati
 
 ### Writing Our Notes
 
-We're love to click the plus sign, have it create a new note, and pop up the keyboard.
+We'd love to click the plus sign, have it create a new note, and pop up the keyboard.
 
-Let's take a look at how we do this. On Line 38.
+In `MasterViewController`, we'll add some code.
+
+Let's take a look at how we do this. In the `insertNewObject` method, add the following:
 
 ```swift
 self.performSegueWithIdentifier("showDetail", sender: self)
 ```
 
+`insertNewObject` should now look like this:
+
+```swift
+func insertNewObject(sender: AnyObject) {
+  allNotes.insert(Note(), atIndex: 0)
+  let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+  self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+  self.performSegueWithIdentifier("showDetail", sender: self)
+}
+```
+
 Let's pop down to `prepareForSegue`. We also want to set a reminder as to where we came from.
 
-In our conditional, let's add a new line below Line 46 and add the following content.
+In our conditional, let's add a new line below Line 48 and add the following content in the `prepareForSegue` method:
 
 ```swift
 currentNoteIndex = indexPath.row
@@ -325,7 +338,23 @@ if let indexPath = self.tableView.indexPathForSelectedRow() {
 }
 ```
 
-The obvious question here is "Huh? What?" Good question. Allow me to explain what we did here. Previously, when we clicked on the "+", it popped an empty note on the begginning of `allNotes` and then we were able to click on it. That's not the greatest UX in the world.
+`prepareForSegue` should now look like this:
+
+```swift
+override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+  if segue.identifier == "showDetail" {
+    if let indexPath = self.tableView.indexPathForSelectedRow() {
+      let object = allNotes[indexPath.row]
+      currentNoteIndex = indexPath.row
+    }
+    else {
+      currentNoteIndex = 0
+    }
+  }
+}
+```
+
+The obvious question here is "Huh? What?" Good question. Allow me to explain what we did here. Previously, when we clicked on the "+", it popped an empty note on the beginning of `allNotes` and then we were able to click on it. That's not the greatest UX in the world.
 
 Now, when we click on a note, it works. But if we never gave it a note (e.g. we clicked on the plus sign) then it will set the note to the top of the `allNotes` array.
 
@@ -334,30 +363,30 @@ Now, when we click on a note, it works. But if we never gave it a note (e.g. we 
 In the `viewDidLoad` method on `DetailViewController`, let's set the text of the text view to the text of our note. (Say that three times fast.)
 
 ```swift
-tView.text = allNotes[currentNoteIndex].note
+noteTextView.text = allNotes[currentNoteIndex].note
 ```
 
 ### Get the Keyboard Up
 
 ```swift
-tView.becomeFirstResponder()
+noteTextView.becomeFirstResponder()
 ```
 
 ### Edit, Save, and Delete Notes
 
 In `DetailViewController`, let's add a new method: `viewWillDisappear`. This will fire when the view is about to disappear. Duh.
 
-Now, there are a view situations here. We don't want to save blank notes. But we do want to save it if there is some content.
+Now, there are a few situations here that we need to deal with. We don't want to save blank notes. But we do want to save it if there is some content.
 
 ```swift
 override func viewWillDisappear(animated: Bool) {
   super.viewWillDisappear(animated)
-  if tView.text == "" {
+  if noteTextView.text == "" {
     allNotes.removeAtIndex(currentNoteIndex)
   } else {
-    allNotes[currentNoteIndex].note = tView.text
+    allNotes[currentNoteIndex].note = noteTextView.text
   }
-  Notes.saveNotes()
-  noteTable?.reloatData()
+  Note.saveNotes()
+  noteTable?.reloadData()
 }
 ```
