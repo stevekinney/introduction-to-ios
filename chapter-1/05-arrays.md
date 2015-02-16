@@ -54,7 +54,27 @@ var beatles = ["John", "Paul", "George", "Ringo"]
 beatles.append(5)
 ```
 
-Swift, like Java and C, can only store one type of object in its array. So, you can have an a array of strings or you can have an array of integers, but you can't mix and match.
+On assignment, Swift will infer the type of the array. In this case, it will infer the type as `<String>` since this is what was initially in the array when it was created.
+
+With this in mind, realize that Swift can create multi-type arrays, just not as simply as other dynamically typed languages. For instance, you could create an array like this:
+
+```swift
+var beatlesAndNumber = ["John", "Paul", "George", "Ringo", 10]
+
+beatlesAndNumber.append(5)
+```
+
+The append would now work correctly. This is because when you instantiated this array, Swift saw that it contained multiple types of objects, so it inferred the array to be of type `<AnyObject>`.
+
+Specifying an array instantiation as an `<AnyObject>` will allow your array to contain any type, even other arrays.
+
+```swift
+var beatlesAndOtherThings:[AnyObject] = ["John", "Paul", "George", "Ringo", 10, ["hello", 1]]
+
+beatlesAndOtherThings.append(5)
+```
+
+Even though it is valid code to create arrays with multiple types, and it is not recommended by Apple to do so, so try and avoid it.
 
 If you recall from when we talked about variables and constants, Swift takes a lucky guess when you first declare your variable or constant.
 
@@ -63,14 +83,18 @@ But sometimes, we want to start out with an empty array and add stuff to it as w
 There is a special syntax for declaring an empty array.
 
 ```swift
-var beatles: [String]
+var beatles: [String] = []
+
+beatles.isEmpty // returns true
 
 beatles.append("John")
 beatles.append("Paul")
 beatles.append("George")
 beatles.append("Ringo")
 
-var numbers: [Int]
+beatles.isEmpty // returns false
+
+var numbers: [Int] = []
 
 numbers.append(1)
 numbers.append(2)
@@ -99,7 +123,7 @@ numbers.insert(7, atIndex: 6)
 println(numbers) //  [1,2,3,6,4,5,7]
 ```
 
-We can also combine arrays with `+=`:
+We can also append multiple items to a given array with the `+=`:
 
 ```swift
 var numbers = [1, 2, 3]
@@ -109,12 +133,32 @@ numbers += [4, 5, 6] // numbers will be [1, 2, 3, 4, 5, 6]
 numbers += [7] // numbers will be [1, 2, 3, 4, 5, 6, 7]
 ```
 
+And add values contained in the array indices:
+
+```swift
+var numbers = [3, 4, 5, 6]
+
+var addedIndicies = numbers[0] + numbers[1] // returns 7
+```
+
+Or replace items in an array with something else:
+
+```swift
+var numbers = [1, 2, 3, 4]
+
+numbers[1] = 5 // numbers will now be [1, 5, 3, 4]
+
+numbers[0...2] = [6, 7, 8] // numbers will now be [6, 7, 8, 4]
+```
+
 Swift can giveth and Swift can taketh away:
 
 ```swift
-var numbers = [1, 2, 3]
+var numbers = [1, 2, 3, 4]
 
-numbers.removeAtIndex(1) // numbers is now [1, 3]
+numbers.removeAtIndex(1) // numbers is now [1, 3, 4]
+
+numbers.removeLast() // numbers is now [1, 3]
 ```
 
 ### Quick Practice
